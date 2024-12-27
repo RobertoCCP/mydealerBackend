@@ -1,0 +1,32 @@
+services:
+  composer:
+    container_name: mydealer-composer
+    build:
+      dockerfile: ./Dockerfile
+      target: builder
+      args:
+        - name=${USER}
+        - password=mydealer
+        - permissions=sudo
+    image: mydealer/backend:0.1.0
+    user: ${USER}
+    command: >
+      sh -c "bash ./scripts/laravel-installer.sh"
+    volumes:
+      - ./:/code
+
+  server:
+    container_name: mydealer-server
+    image: mydealer/backend:0.1.0
+    user: ${USER}
+    ports:
+      - 8000:8000
+    depends_on:
+      composer:
+        condition: service_completed_successfully
+    volumes:
+      - ./:/code
+      - ./:/workspace:cached
+    # extra_hosts:
+    #   - 'host.docker.internal:host-gateway'
+    command: php artisan serve --host 0.0.0.0

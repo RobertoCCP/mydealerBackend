@@ -1,0 +1,6 @@
+vendor
+Dockerfile
+.dockerignore
+.gitignore
+.git
+.vscode
