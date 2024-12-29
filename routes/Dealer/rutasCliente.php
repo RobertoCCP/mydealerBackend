@@ -12,11 +12,25 @@ use App\Http\Controllers\Marca\MarcaController;
 use App\Http\Controllers\Pedido\PedidoController;
 use App\Http\Controllers\Producto\AllProductosController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+
+Route::post('password/forgot', [ForgotPasswordController::class, 'sendResetLinkEmail']); // Para enviar el enlace de restablecimiento
+// Ruta para mostrar el formulario de restablecimiento de contraseña
+Route::get('password/reset/{token}/{email}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+
+// Ruta para procesar el restablecimiento de la contraseña
+Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name('password.update');
+
+// Ruta para mostrar el mensaje de éxito después de un restablecimiento exitoso
+Route::get('password/success', function() {
+    return view('auth.passwords.success');
+})->name('password.success');
 
 #AUTH
 
 Route::post('/login/cliente', [AuthenticatedClienteSessionController::class, 'login']);
-
+// Ruta para procesar el restablecimiento de la contraseña
+Route::post('password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 #CLIENTES
 
 Route::post('/clientes/register', [RegistroClienteController::class, 'register']);

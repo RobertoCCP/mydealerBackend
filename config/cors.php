@@ -23,6 +23,7 @@ return [
     'allowed_origins' => [
         env('FRONTEND_URL', 'http://localhost:3000'),  // Cambia esto si tu frontend usa otro puerto o dirección
         env('TEST_FRONTEND_URL', 'http://localhost:4200'),  // Si tienes un entorno de prueba, también agrégalo
+        'http://10.0.2.2:8000',
     ],
 
     'allowed_origins_patterns' => [],  // No es necesario si no necesitas patrones de origen

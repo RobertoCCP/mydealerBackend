@@ -17,23 +17,9 @@ class Cliente extends Authenticatable implements JWTSubject
     protected $keyType = 'string';
 
     protected $fillable = [
-        'codcliente',
-        'nombre',
-        'email',
-        'password',
-        'estado',
-        'pais',
-        'provincia',
-        'ciudad',
-        'codvendedor',
-        'codformapago',
-        'limitecredito',
-        'saldopendiente',
-        'cedularuc',
-        'codlistaprecio',
-        'calificacion',
-        'nombrecomercial',
-        'login'
+'codcliente', 'codtipocliente', 'nombre', 'email', 'pais', 'provincia', 'ciudad',
+        'codvendedor', 'codformapago', 'estado', 'limitecredito', 'saldopendiente',
+        'cedularuc', 'codlistaprecio', 'calificacion', 'nombrecomercial', 'login', 'password'
     ];
 
     public $timestamps = false;
