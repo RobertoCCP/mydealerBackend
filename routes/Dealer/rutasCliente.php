@@ -13,6 +13,13 @@ use App\Http\Controllers\Pedido\PedidoController;
 use App\Http\Controllers\Producto\AllProductosController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\TipoClienteController;
+use App\Http\Controllers\Vendedor\VendedorController;
+
+Route::get('/vendedor', [VendedorController::class, 'obtenerInfoVendedor']);
+
+Route::get('/tiposclientes', [TipoClienteController::class, 'index']);
+
 
 Route::post('password/forgot', [ForgotPasswordController::class, 'sendResetLinkEmail']); // Para enviar el enlace de restablecimiento
 // Ruta para mostrar el formulario de restablecimiento de contraseña
