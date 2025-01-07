@@ -36,6 +36,7 @@ Route::get('password/success', function() {
 #AUTH
 
 Route::post('/login/cliente', [AuthenticatedClienteSessionController::class, 'login']);
+Route::post('/login/vendedor', [AuthenticatedClienteSessionController::class, 'loginVendedor']);
 // Ruta para procesar el restablecimiento de la contraseña
 Route::post('password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 #CLIENTES

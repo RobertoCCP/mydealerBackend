@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class OrdenController extends Controller
 {
 
-    
+
 /**
  * @OA\Get(
  *     path="/api/ordenesR",
@@ -239,7 +239,7 @@ public function indexR(Request $request)
             if ($idCliente != 'TODOS') {
                 $query->where('cliente.codcliente', $idCliente);
             }
-            
+
             $result = $query->select('orden.*', 'orden.estado as orden_estado',
             'cliente.codcliente as cliente_codcliente',
             'cliente.nombre as cliente_nombre',
@@ -255,7 +255,7 @@ public function indexR(Request $request)
             foreach ($result as $key => $value) {
                 $detalles = DB::table('ordendet')
                     ->join('producto', 'producto.codproducto', '=', 'ordendet.codproducto')
-                    ->where('ordendet.srorden', $value->srorden)
+                    ->where('ordendet.idorden', $value->idorden)
                     ->select('ordendet.*', 'producto.*')
                     ->get();
                 $result[$key]->detalles = $detalles;
@@ -445,7 +445,7 @@ public function indexR(Request $request)
         ->join('cliente', 'orden.codcliente', '=', 'cliente.codcliente')
         ->where('orden.codvendedor', $idVendedor)
         ->where('orden.estado', $estado);
-        
+
         $result = $query->select('orden.*', 'orden.estado as orden_estado',
         'cliente.codcliente as cliente_codcliente',
         'cliente.nombre as cliente_nombre',
@@ -532,7 +532,7 @@ if ($idVendedor == '') {
 $query = DB::table('orden')
    ->join('cliente', 'orden.codcliente', '=', 'cliente.codcliente')
    ->where('orden.codvendedor', $idVendedor);
-   
+
    $result = $query->select('orden.*', 'orden.estado as orden_estado',
    'cliente.codcliente as cliente_codcliente',
    'cliente.nombre as cliente_nombre',
@@ -622,5 +622,5 @@ if (count($result) > 0) {
         return redirect()->route('ordens.index')->with('success', 'Order deleted successfully.');
     }
 
-    
+
 }
