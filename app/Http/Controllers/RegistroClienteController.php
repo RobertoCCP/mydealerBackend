@@ -55,7 +55,7 @@ class RegistroClienteController extends Controller
             'cedularuc' => $data['cedularuc'],
             'codlistaprecio' => $data['codlistaprecio'],
             'calificacion' => $data['calificacion'],
-            // 'nombrecomercial' => $data['nombrecomercial'],
+            'nombrecomercial' => $data['nombrecomercial'],
             'login' => $data['login'],
             'password' => $data['password'],  // Agregar la contraseña
         ];
@@ -64,7 +64,7 @@ class RegistroClienteController extends Controller
         $w_cliente['nombrecomercial'] = $codigo;
         // Crear el cliente
         $cliente = RegistroCliente::create($w_cliente);
-        // $w_enviarCorreo = $this->envioCorreo($data['email'], 'Código de verificación', "Su código de verificación es: " . $codigo);
+        $w_enviarCorreo = $this->envioCorreo($data['email'], 'Código de verificación', "Su código de verificación es: " . $codigo);
         return response()->json(['message' => 'Cliente registrado exitosamente', 'cliente' => $cliente], 201);
     }
     function generarCodigoTemporal($clave, $duracionEnMinutos = 60)
