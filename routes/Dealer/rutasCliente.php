@@ -42,7 +42,9 @@ Route::post('password/reset', [ForgotPasswordController::class, 'resetPassword']
 #CLIENTES
 
 Route::post('/clientes/register', [RegistroClienteController::class, 'register']);
+Route::get('/clientes/validarCodigo/{codCliente}/{codigoTemp}', [RegistroClienteController::class, 'verificarCodigoTemporal']);
 Route::get('/clientes/{codcliente}', [RegistroClienteController::class, 'show']);
+Route::get('/clientesenvioCorreo/{correo}', [RegistroClienteController::class, 'envioCorreo']);
 
 #PRODUCTOS
 
