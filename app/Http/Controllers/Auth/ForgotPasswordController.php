@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente\Cliente;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -84,8 +83,8 @@ class ForgotPasswordController extends Controller
             return redirect()->back()->withErrors(['email' => 'No se encontró una cuenta con ese correo.']);
         }
 
-        // Actualizar la contraseña
-        $cliente->password = Hash::make($request->password);
+        // Actualizar la contraseña sin hacerle hash
+        $cliente->password = $request->password; // No usar Hash::make()
         $cliente->save();
 
         // Eliminar el token

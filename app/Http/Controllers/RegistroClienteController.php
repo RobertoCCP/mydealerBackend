@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
+
 class RegistroClienteController extends Controller
 {
     public function register(Request $request)
@@ -55,18 +56,21 @@ class RegistroClienteController extends Controller
             'cedularuc' => $data['cedularuc'],
             'codlistaprecio' => $data['codlistaprecio'],
             'calificacion' => $data['calificacion'],
-            'nombrecomercial' => $data['nombrecomercial'],
+            'nombrecomercial' => $data['nombrecomercial'], // Mantener el valor del nombre comercial
             'login' => $data['login'],
-            'password' => $data['password'],  // Agregar la contraseña
+            'password' => $data['password'],
         ];
-        $codigo = $this->generarCodigoTemporal($w_cliente['codcliente']);
-        // var_dump($codigo);
-        $w_cliente['nombrecomercial'] = $codigo;
+        
         // Crear el cliente
         $cliente = RegistroCliente::create($w_cliente);
-        $w_enviarCorreo = $this->envioCorreo($data['email'], 'Código de verificación', "Su código de verificación es: " . $codigo);
+
+        // Enviar correo de verificación
+        $w_enviarCorreo = $this->envioCorreo($data['email'], 'Código de verificación', "Su código de verificación es: " . $this->generarCodigoTemporal($w_cliente['codcliente']));
+
         return response()->json(['message' => 'Cliente registrado exitosamente', 'cliente' => $cliente], 201);
     }
+
+    // Función para generar el código temporal
     function generarCodigoTemporal($clave, $duracionEnMinutos = 60)
     {
         $codigo = Str::random(6);
@@ -74,7 +78,7 @@ class RegistroClienteController extends Controller
         return $codigo;
     }
 
-
+    // Función para enviar el correo
     function envioCorreo($destinatario, $titulo = 'Mensaje de prueba Mydealer', $mensaje = 'Mensaje enviado desde Mydealer') {
         if ($destinatario == null) {
             return false; 
@@ -90,26 +94,32 @@ class RegistroClienteController extends Controller
         }
     }
 
+    // Función para verificar el código temporal
     function verificarCodigoTemporal($clave, $codigoIngresado)
     {
         $codigoGuardado = Cache::get($clave);
-        // var_dump($codigoGuardado);
         if (!$codigoGuardado) {
-            return jsonResponse('9998', 'El codigo ingresado no encontrado');
+            return jsonResponse('9998', 'El código ingresado no se encuentra');
         }
         if($codigoIngresado == $codigoGuardado)
-            return jsonResponse('0', 'Codigo verificado');
-        else  return jsonResponse('9998', 'El codigo ingresado no coincide');
+            return jsonResponse('0', 'Código verificado');
+        else
+            return jsonResponse('9998', 'El código ingresado no coincide');
     }
-    
+
+    // Mostrar información de un cliente
     public function show($codcliente)
     {
         $cliente = RegistroCliente::where('codcliente', $codcliente)->first();
-
+    
         if (!$cliente) {
             return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
-
-        return jsonResponse('La petición se ha completado correctamente.', 'Cliente obtenidos correctamente', [$cliente]);
+    
+        return response()->json([
+            'codigo' => '0',
+            'mensaje' => 'Cliente obtenido correctamente',
+            'data' => [$cliente]
+        ]);
     }
 }
