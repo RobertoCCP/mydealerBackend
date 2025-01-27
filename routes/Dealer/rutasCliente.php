@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\TipoClienteController;
 use App\Http\Controllers\Vendedor\VendedorController;
+use App\Http\Controllers\Clientes\ClienteController;
 
 Route::get('/vendedor', [VendedorController::class, 'obtenerInfoVendedor']);
+Route::get('/clientes', [ClienteController::class, 'obtenerInfoClientes']);
 
 Route::get('/tiposclientes', [TipoClienteController::class, 'index']);
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class VendedorController extends Controller
 {
@@ -532,31 +533,44 @@ class VendedorController extends Controller
      *     )
      * )
      */
-    public function obtenerOrdenes(Request $request, $codvendedor)
+    public function obtenerOrdenes($codvendedor)
     {
         try {
-            $page = $request->query('page', 1);
-            $perPage = 20;
+           // $page = $request->query('page', 1);
+          // $perPage = 20;
 
-            $result = DB::table('orden as o')
-                ->join('cliente as c', 'o.codcliente', '=', 'c.codcliente')
-                ->join('ordendet as od', 'o.srorden', '=', 'od.srorden')
-                ->select(
-                    'o.srorden as Orden',
-                    'o.fecha as Fecha',
-                    'c.nombre as Nombre_del_Cliente',
-                    DB::raw('SUM(od.total) as Total')
-                )
-                ->where('o.codvendedor', $codvendedor)
-                ->groupBy('o.srorden', 'o.fecha', 'c.nombre')
-                ->paginate($perPage, ['*'], 'page', $page);
-
+            // $result = DB::table('orden as o')
+            //     ->join('cliente as c', 'o.codcliente', '=', 'c.codcliente')
+            //     ->join('ordendet as od', 'o.srorden', '=', 'od.srorden')
+            //     ->select(
+            //         'o.srorden as Orden',
+            //         'o.fecha as Fecha',
+            //         'c.nombre as Nombre_del_Cliente',
+            //         DB::raw('SUM(od.total) as Total')
+            //     )
+            //     ->where('o.codvendedor', $codvendedor)
+            //     ->groupBy('o.srorden', 'o.fecha', 'c.nombre')
+            //     ->paginate($perPage, ['*'], 'page', $page);
+            $result = DB::table('orden as o')->select('*')->where('o.codvendedor', $codvendedor)->get();
             return $this->success($result);
         } catch (\Exception $e) {
             return $this->error('Error al obtener las órdenes.', $e->getMessage(), 500);
         }
     }
-
+    function envioCorreo($destinatario, $titulo = 'Mensaje de prueba Mydealer', $mensaje = 'Mensaje enviado desde Mydealer') {
+        if ($destinatario == null) {
+            return false;
+        }
+        var_dump($destinatario);
+        try {
+            Mail::raw($mensaje, function ($message) use ($destinatario, $titulo) {
+                $message->to($destinatario)->subject($titulo);
+            });
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
     private function decodeBlob($blob)
     {
         return is_null($blob) ? null : mb_convert_encoding($blob, 'UTF-8', 'binary');

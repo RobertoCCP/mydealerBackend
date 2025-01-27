@@ -41,6 +41,7 @@ Route::get('/vendedor/informacion/{codvendedor}', [VendedorController::class, 'o
 Route::get('/vendedor/numeroPedidos/{codvendedor}', [VendedorController::class, 'obtenerNumeroPedidos']);
 Route::get('/vendedor/numeroCobros/{codvendedor}', [VendedorController::class, 'obtenerNumeroCobros']);
 Route::get('/vendedor/pedidos/{codvendedor}', [VendedorController::class, 'obtenerOrdenes']);
+Route::get('/notificacionPedido/{destinatario}/{titulo}/{mensaje}', [VendedorController::class, 'envioCorreo']);
 
 #REPORTE DE CLIENTES
 

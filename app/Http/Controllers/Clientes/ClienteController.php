@@ -63,4 +63,17 @@ class ClienteController extends Controller {
       return $this->error('Error al obtener los clientes.', $e->getMessage(), 500);
     }
   }
+  public function obtenerInfoClientes(Request $request)
+  {
+      try {
+          $page = $request->query('page', 1);
+          $perPage = 20;
+          $clientes = Cliente::select('*'
+          )->paginate($perPage, ['*'], 'page', $page);
+
+          return $this->success($clientes, 'Información de los clientes encontrada correctamente');
+      } catch (\Exception $e) {
+          return $this->error('Error al obtener la información de los vendedor.', $e->getMessage(), 500);
+      }
+  }
 }
