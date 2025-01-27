@@ -138,4 +138,5 @@ php artisan serve
 
 ### Pasos Flutter:
 flutter pub get
+```sh
 flutter run
