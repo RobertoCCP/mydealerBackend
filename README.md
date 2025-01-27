@@ -64,7 +64,7 @@ Edite las siguientes variables en el archivo `.env`.
 ```sh
 APP_NAME="My Dealer"
 APP_ENV=local
-APP_KEY=base64:R3mtmLz9VEqoueXol6rH/pUwQSB/M+HkbTDA78LqLkk=
+APP_KEY=
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000
 FRONTEND_URL=
