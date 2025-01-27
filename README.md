@@ -137,6 +137,9 @@ php artisan serve
 ```
 
 ### Pasos Flutter:
+```sh
 flutter pub get
+```
 ```sh
 flutter run
+```
