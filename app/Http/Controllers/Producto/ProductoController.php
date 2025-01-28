@@ -44,13 +44,13 @@ class ProductoController extends Controller
     //  *     ),
     //  * @OA\Response(
     //  *         response=200,
-    //  *         description="successful operation",     
+    //  *         description="successful operation",
     //  *     ),
     //  * @OA\Response(
     //  *     response=500,
     //  *     description="Database error"
     //  * ),
-    //  * )  
+    //  * )
     //  */
 
     public function productoDetalles(Request $request)
@@ -111,7 +111,7 @@ class ProductoController extends Controller
     *         description="Error en la base de datos"
     *     )
     * )
-    */   
+    */
     public function buscarPorCategoria(Request $request)
     {
         $categoria = $request->input('categoria');
@@ -138,6 +138,13 @@ class ProductoController extends Controller
         }
     }
 
+    public function productosTipoCategoria($tipoCategoria)
+    {
+        $productos = Producto::select("*")->where('codtipoproducto', $tipoCategoria)->get();
+        return $this->success($productos, 'Productos encontrados', 200);
+    }
+
+
     /**
     * @OA\Get(
     *     path="/api/productos/nombre",
@@ -162,25 +169,14 @@ class ProductoController extends Controller
     *     )
     * )
     */
-    public function buscarPorNombre(Request $request)
+    public function buscarPorNombre($nombre)
     {
-        $nombre = $request->input('nombre');
+        //$nombre = $request->input('nombre');
 
-        $productos = Producto::with(['stocks'])->where('nombre', 'LIKE', '%' . $nombre . '%')->get();
-        $resultados = $productos->map(function ($producto) {
-            $stock = $producto->stocks->sum('stock');
-            return [
-                'codproducto' => $producto->codproducto,
-                'nombre' => $producto->nombre,
-                'precio' => $producto->costo,
-                'precio_con_descuento' => $this->calcularDescuento($producto),
-                'imagen' => $producto->imagen,
-                'porc_descuento' => $producto->porcdescuento,
-                'cantidad_en_stock' => $stock
-            ];
-        });
+        $productos = Producto::select('*')->where('nombre', 'LIKE', '%' . $nombre . '%')->limit(2)->get();
 
-        return $this->success($resultados, 'Ok!!');
+
+        return $this->success($productos, 'Ok!!');
     }
 
         /**
@@ -286,7 +282,7 @@ class ProductoController extends Controller
      */
         public function productoDetalle($codproducto)
         {
-    
+
             try {
                 $producto = Producto::with('stocks', 'tipo', 'marca')->where('codproducto', $codproducto)->first();
                 if ($producto) {
@@ -302,8 +298,8 @@ class ProductoController extends Controller
                 return $this->error($e->getMessage(), 'Error en el servidor', 500);
             }
         }
-    
-    
+
+
         #TODO:: Obtener productos de un mismo tipo
       /**
     * @OA\Get(
@@ -335,7 +331,7 @@ class ProductoController extends Controller
     * @OA\Response(
     *     response=200,
     *     description="Operación exitosa",
-    *    
+    *
     * ),
     * @OA\Response(
     *     response=400,
@@ -354,12 +350,12 @@ class ProductoController extends Controller
             $limit = $request->query('limit', 10); // por defecto 10
             $offset = $request->query('offset', 0); // por defecto 0
             $codproducto= $request->query('codproducto'); //Código del producto
-            
+
             // Validar que los parámetros son números enteros positivos
             if (!is_numeric($limit) || !is_numeric($offset) || $limit <= 0 || $offset < 0) {
                 return $this->error('Parámetros de paginación inválidos.', null, 400);
             }
-    
+
             // Calcular el valor del OFFSET en base al número de página
             $offsetValue = $offset * $limit;
 
@@ -368,14 +364,14 @@ class ProductoController extends Controller
                     ->where('codproducto', '!=', $codproducto);
                     // Obtener el total de productos
                 $totalProductos = $productos->count();
-                
+
                 // Obtener los productos paginados
                 $productos = $productos->skip($offsetValue)->take($limit)->get();
-    
+
                 if ($productos->isEmpty()) {
                     return $this->error(null, 'No hay otros productos del mismo tipo', 404);
                 }
-    
+
                 return $this->success(
                     [
                         'productos' => ProductoDetalleResource::collection($productos),

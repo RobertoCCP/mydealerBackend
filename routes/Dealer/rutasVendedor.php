@@ -65,7 +65,7 @@ Route::get('/pedidosCompleto', [OrdenController::class, 'pedidosCompleto']);
 
 #PEDIDOSPORESTADO
 Route::get('/pedidosEstado/{idVendedor}/{estado}', [OrdenController::class, 'pedidosEstado']);
-Route::get('/pedidosTodos/{idVendedor}', [OrdenController::class, 'pedidosTodos']);
+Route::get('/pedidosEstado/{idVendedor}', [OrdenController::class, 'pedidosTodos']);
 
 # Información de vendedor
 
