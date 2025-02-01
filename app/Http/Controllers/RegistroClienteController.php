@@ -14,10 +14,9 @@ class RegistroClienteController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'codcliente' => 'required|string|max:50|unique:cliente,codcliente',
-            'codtipocliente' => 'nullable|string|max:10|exists:tipocliente,codtipocliente',
+            'codtipocliente' => 'nullable|string|max:20|exists:tipocliente,codtipocliente',
             'nombre' => 'nullable|string|max:300',
-            'email' => 'nullable|string|max:250|email',
+            'email' => 'nullable|string|max:250|email|unique:cliente,email', // Correo único
             'pais' => 'nullable|string|max:60',
             'provincia' => 'nullable|string|max:60',
             'ciudad' => 'nullable|string|max:60',
@@ -26,20 +25,42 @@ class RegistroClienteController extends Controller
             'estado' => 'nullable|string|in:A,I',
             'limitecredito' => 'nullable|numeric',
             'saldopendiente' => 'nullable|numeric',
-            'cedularuc' => 'required|string|max:20',
+            'cedularuc' => 'required|string|size:10|regex:/^\d{10}$/', // Cedula con 10 dígitos
             'codlistaprecio' => 'nullable|string|max:10',
             'calificacion' => 'nullable|string|max:30',
             'nombrecomercial' => 'nullable|string|max:100',
-            'login' => 'nullable|string|max:15|unique:cliente,login',
-            'password' => 'nullable|string|max:15',
+            'login' => 'nullable|string|max:15|unique:cliente,login', // Login único
+            'password' => [
+                'nullable',
+                'string',
+                'min:8', // Contraseña con mínimo 8 caracteres
+                'regex:/[a-zA-Z]/', // Al menos una letra
+                'regex:/[0-9]/', // Al menos un número
+                'regex:/[^a-zA-Z0-9]/', // Al menos un carácter especial
+            ],
+        ], [
+            'email.unique' => 'El correo electrónico ya está registrado.',
+            'email.email' => 'El correo electrónico ingresado no es válido.',
+            'cedularuc.size' => 'La cédula debe tener exactamente 10 dígitos.',
+            'cedularuc.regex' => 'La cédula ingresada debe ser un número válido de 10 dígitos.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.regex' => 'La contraseña debe contener al menos una letra, un número y un carácter especial.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'login.unique' => 'El nombre de usuario ya está registrado.',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-    
+
         // Preparar los datos para crear el cliente
-        $data = $request->all();        
+        $data = $request->all();
+
+        // Si no se pasa un codcliente, generarlo a partir de la cédula
+        if (!isset($data['codcliente'])) {
+            $data['codcliente'] = 'CLI-' . $data['cedularuc'];
+        }
+
         $w_cliente = [
             'codcliente' => $data['codcliente'],
             'codtipocliente' => $data['codtipocliente'],
@@ -59,8 +80,9 @@ class RegistroClienteController extends Controller
             'nombrecomercial' => $data['nombrecomercial'], // Mantener el valor del nombre comercial
             'login' => $data['login'],
             'password' => $data['password'],
+            //'password' => bcrypt($data['password']), // Encriptar la contraseña
         ];
-        
+
         // Crear el cliente
         $cliente = RegistroCliente::create($w_cliente);
 
