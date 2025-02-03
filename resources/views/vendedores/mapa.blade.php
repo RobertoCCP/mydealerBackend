@@ -30,7 +30,6 @@
                 alert('Coordenadas no válidas');
                 return;
             }
-
             // Inicializa el mapa centrado en las coordenadas
             const map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 15,
