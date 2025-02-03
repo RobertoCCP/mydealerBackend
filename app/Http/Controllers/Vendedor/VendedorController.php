@@ -29,13 +29,13 @@ class VendedorController extends Controller
      * ),
      * @OA\Response(
      *         response=200,
-     *         description="successful operation",     
+     *         description="successful operation",
      *     ),
      * @OA\Response(
      *     response=500,
      *     description="Database error"
      * ),
-     * )  
+     * )
      */
     public function obtenerInformacion($codvendedor)
     {
@@ -70,13 +70,13 @@ class VendedorController extends Controller
      * ),
      * @OA\Response(
      *         response=200,
-     *         description="successful operation",     
+     *         description="successful operation",
      *     ),
      * @OA\Response(
      *     response=500,
      *     description="Database error"
      * ),
-     * )  
+     * )
      */
     public function obtenerNumeroPedidos($codvendedor)
     {
@@ -114,13 +114,13 @@ class VendedorController extends Controller
      * ),
      * @OA\Response(
      *         response=200,
-     *         description="successful operation",     
+     *         description="successful operation",
      *     ),
      * @OA\Response(
      *     response=500,
      *     description="Database error"
      * ),
-     * )  
+     * )
      */
     public function obtenerNumeroCobros($codvendedor)
     {
@@ -536,8 +536,8 @@ class VendedorController extends Controller
     public function obtenerOrdenes($codvendedor)
     {
         try {
-           // $page = $request->query('page', 1);
-          // $perPage = 20;
+            // $page = $request->query('page', 1);
+            // $perPage = 20;
 
             // $result = DB::table('orden as o')
             //     ->join('cliente as c', 'o.codcliente', '=', 'c.codcliente')
@@ -557,7 +557,9 @@ class VendedorController extends Controller
             return $this->error('Error al obtener las órdenes.', $e->getMessage(), 500);
         }
     }
-    function envioCorreo($destinatario, $titulo = 'Mensaje de prueba Mydealer', $mensaje = 'Mensaje enviado desde Mydealer') {
+
+    function envioCorreo($destinatario, $titulo = 'Mensaje de prueba Mydealer', $mensaje = 'Mensaje enviado desde Mydealer')
+    {
         if ($destinatario == null) {
             return false;
         }
@@ -571,8 +573,74 @@ class VendedorController extends Controller
             return false;
         }
     }
+
     private function decodeBlob($blob)
     {
         return is_null($blob) ? null : mb_convert_encoding($blob, 'UTF-8', 'binary');
+    }
+
+    public function obtenerCoordenadas()
+    {
+        try {
+            $subquery = DB::table('coordenadasvendedor')
+                ->select('codvendedor', DB::raw('MAX(fecha) as max_fecha'))
+                ->groupBy('codvendedor');
+
+            $coordenadas = DB::table('coordenadasvendedor as c')
+                ->joinSub($subquery, 'latest', function ($join) {
+                    $join->on('c.codvendedor', '=', 'latest.codvendedor')
+                        ->on('c.fecha', '=', 'latest.max_fecha');
+                })
+                ->select('c.codvendedor', 'c.latitud', 'c.longitud', 'c.fecha', 'c.bateria')
+                ->get();
+
+            if ($coordenadas->isEmpty()) {
+                return $this->error('No data', 'No se encontraron coordenadas.', 404);
+            }
+
+            $message = 'Coordenadas obtenidas correctamente';
+            return $this->success($coordenadas, $message);
+        } catch (\Exception $e) {
+            return $this->error('Error al obtener las coordenadas.', $e->getMessage(), 500);
+        }
+    }
+
+    function obtenerCoordenadasVendedores()
+    {
+        try {
+            $coordenadas = DB::table('coordenadasvendedor')
+                ->join('vendedor', 'coordenadasvendedor.codvendedor', '=', 'vendedor.codvendedor')
+                ->select(
+                    'coordenadasvendedor.codvendedor',
+                    'vendedor.nombre as nombre_vendedor',
+                    'coordenadasvendedor.latitud',
+                    'coordenadasvendedor.longitud',
+                    'coordenadasvendedor.fecha',
+                    'coordenadasvendedor.bateria',
+                    'coordenadasvendedor.version',
+                    'coordenadasvendedor.mac'
+                )
+                ->get();
+
+            if ($coordenadas->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontraron registros.',
+                    'data' => []
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registros obtenidos correctamente.',
+                'data' => $coordenadas
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los registros.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

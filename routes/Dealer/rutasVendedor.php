@@ -53,7 +53,6 @@ Route::get('/vendedor/clientes/{codvendedor}/{codruta}/{codcliente}', [ClientesR
 Route::get('/vendedor/clientesVendedor/{codvendedor}/{codcliente}', [ClientesRutaController::class, 'ClientesPorVendedor']);
 
 
-
 #PEDIDOS
 
 Route::get('/pedidosCompleto/{idVendedor}/{desde}/{hasta}/{idCliente}/{estado}', [OrdenController::class, 'pedidosCompleto']);
@@ -84,5 +83,23 @@ Route::apiResource('perfil', PerfilController::class);
 Route::get('/gpshorarios', [GpsHorarioController::class, 'index']);
 Route::apiResource('gpshorarios', GpsHorarioController::class);
 
+
 #CONFIGURACION
 Route::get('/config', [ConfiguracionMovilController::class, 'index']);
+
+#GPS ENVIO
+Route::get('/vendedor/coordenadasGps', [GPSVendedorController::class, 'obtenerCoordenadasVendedores']);
+Route::post('/vendedor/crearCoordenadasGps', [GPSVendedorController::class, 'crearCoordenadasVendedor']);
+
+#Vistas
+Route::get('/vendedores/ubicacion', function () {
+    return view('vendedores.ubicacion');
+});
+Route::get('/vendedores/ubicacion/reporte', function () {
+    return view('vendedores.reporte_vendedores');
+});
+Route::get('/vendedor/coordenadas', [VendedorController::class, 'obtenerCoordenadas']);
+Route::get('vendedor/coordenadas/reporte', [VendedorController::class, 'obtenerCoordenadasVendedores']);
+Route::get('vendedores/mapa', function () {
+    return view('vendedores.mapa');
+});
