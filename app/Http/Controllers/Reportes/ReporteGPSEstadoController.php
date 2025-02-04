@@ -107,4 +107,31 @@ class ReporteGPSEstadoController extends Controller {
             return $this->error('Error al obtener los reportes de GPS.', $e->getMessage(), 500);
         }
     }
+    public function store(ReporteGPSEstadoRequest $request) {
+        try {
+            $reporte = new ReporteGps();
+            $reporte->fill($request->all());
+            $reporte->save();
+
+            return $this->success('Reporte de GPS creado correctamente.', new ReporteGPSEstadoResource($reporte), 201);
+        } catch (\Exception $e) {
+            return $this->error('Error al crear el reporte de GPS.', $e->getMessage(), 500);
+        }
+    }
+    public function update(ReporteGPSEstadoRequest $request, $id) {
+        try {
+            $reporte = ReporteGps::find($id);
+
+            if (!$reporte) {
+                return $this->error('Reporte de GPS no encontrado.', 'El reporte de GPS con el id ' . $id . ' no existe.', 404);
+            }
+
+            $reporte->fill($request->all());
+            $reporte->save();
+
+            return $this->success('Reporte de GPS actualizado correctamente.', new ReporteGPSEstadoResource($reporte));
+        } catch (\Exception $e) {
+            return $this->error('Error al actualizar el reporte de GPS.', $e->getMessage(), 500);
+        }
+    }
 }

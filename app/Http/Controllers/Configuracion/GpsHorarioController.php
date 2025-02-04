@@ -125,5 +125,18 @@ class GpsHorarioController extends Controller
 
         return response()->json($gpshorario, 200);
     }
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'nombredia' => 'required|string|max:15',
+            'horaini' => 'nullable|date_format:H:i:s',
+            'horafin' => 'nullable|date_format:H:i:s',
+            'frecuenciatoma' => 'required|integer',
+        ]);
+
+        $gpshorario = GpsHorario::create($validatedData);
+
+        return response()->json($gpshorario, 201);
+    }
 
 }

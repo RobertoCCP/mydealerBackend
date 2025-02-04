@@ -24,7 +24,7 @@ use App\Http\Controllers\Carrito\CarritoController;
 use App\Http\Requests\Reportes\ReporteCorreosRequest;
 
 // RUTA DE PRUEBA
-Route::get('/helloworld', fn () => ['message' => 'Hello World!']);
+Route::get('/helloworld', fn() => ['message' => 'Hello World!']);
 
 #AUT
 
@@ -116,9 +116,10 @@ Route::get('reporte/direccion/envio', [ReporteDireccionEnvioController::class, '
 // Recuperacion de clientes
 Route::get('cliente', [ClienteController::class, 'index']);
 
-// Carrito 
+// Carrito
 Route::post('/carrito/agregar', [CarritoController::class, 'agregarProducto']);
 Route::get('/carrito', [CarritoController::class, 'listarProductosCarrito']);
-Route::put('/carrito/actualizar', [CarritoController::class,'actualizarCantidad']);
-Route::delete('/carrito/borrarProducto', [CarritoController::class,'eliminarProductoCarrito']);
+Route::put('/carrito/actualizar', [CarritoController::class, 'actualizarCantidad']);
+Route::delete('/carrito/borrarProducto', [CarritoController::class, 'eliminarProductoCarrito']);
 Route::post('/carrito/seleccionarArticulosCarrito', [CarritoController::class, 'seleccionarArticulosDelCarrito']);
+Route::apiResource('reporte/gps', ReporteGPSEstadoController::class);

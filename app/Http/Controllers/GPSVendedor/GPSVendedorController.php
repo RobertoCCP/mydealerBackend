@@ -432,4 +432,80 @@ class GPSVendedorController extends Controller
             return $this->error('Error al obtener la ruta de gestion.', $e->getMessage(), 500);
         }
     }
+
+    public function obtenerCoordenadasVendedores()
+    {
+        try {
+            $result = DB::table('coordenadasvendedor')->get();
+            if (!$result) {
+                return $this->error("No data", "Información no encontrada", 404);
+            }
+            return $this->success($result);
+        } catch (\Exception $e) {
+            return $this->error('Error al obtener los datos.', $e->getMessage(), 500);
+        }
+    }
+
+    public function crearCoordenadasVendedor(Request $request)
+    {
+        try {
+            $dia = date('N');
+            $dia = $this->getDayNumber($dia);
+            $now = new \DateTime();
+            $now->setTimezone(new \DateTimeZone('America/Guayaquil'));
+            $hora = $now->format('H:i:s');
+            $gpsHorarios = DB::table('gpshorario')->where('numdiasemana', $dia)->get();
+            $result = [];
+            if (count($gpsHorarios) > 0) {
+                $horario = $gpsHorarios[0];
+                if ($horario->horaini < $hora && $horario->horafin > $hora) {
+                    $result = DB::table('coordenadasvendedor')->insert([
+                        'codvendedor' => $request->codvendedor,
+                        'mac' => $request->mac,
+                        'latitud' => $request->latitud,
+                        'longitud' => $request->longitud,
+                        'fecha' => $request->fecha,
+                        'bateria' => $request->bateria,
+                        'version' => $request->version
+                    ]);
+                }
+            }
+            return $this->success($result);
+        } catch (\Exception $e) {
+            return $this->error('Error al crear los datos.', $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * @param string $dia
+     * @return int|string
+     */
+    public function getDayNumber(string $dia): string|int
+    {
+        switch ($dia) {
+            case 1:
+                $dia = 2;
+                break;
+            case 2:
+                $dia = 3;
+                break;
+            case 3:
+                $dia = 4;
+                break;
+            case 4:
+                $dia = 5;
+                break;
+            case 5:
+                $dia = 6;
+                break;
+            case 6:
+                $dia = 7;
+                break;
+            case 0:
+                $dia = 1;
+                break;
+        }
+        return $dia;
+    }
+
 }
