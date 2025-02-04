@@ -449,63 +449,75 @@ class GPSVendedorController extends Controller
     public function crearCoordenadasVendedor(Request $request)
     {
         try {
-            $dia = date('N');
-            $dia = $this->getDayNumber($dia);
+            $dia = $this->obtenerNombreDia();
             $now = new \DateTime();
             $now->setTimezone(new \DateTimeZone('America/Guayaquil'));
-            $hora = $now->format('H:i:s');
-            $gpsHorarios = DB::table('gpshorario')->where('numdiasemana', $dia)->get();
-            $result = [];
-            if (count($gpsHorarios) > 0) {
-                $horario = $gpsHorarios[0];
-                if ($horario->horaini < $hora && $horario->horafin > $hora) {
-                    $result = DB::table('coordenadasvendedor')->insert([
+            $horaActual = $now->format('H:i:s');
+
+            // Obtener el horario del día actual
+            $gpsHorarios = DB::table('gpshorario')->where('nombredia', $dia)->first();
+
+            if ($gpsHorarios) {
+                if ($gpsHorarios->horaini < $horaActual && $gpsHorarios->horafin > $horaActual) {
+
+                    // Verificar la última coordenada registrada
+                    $ultimaCoordenada = DB::table('coordenadasvendedor')
+                        ->where('codvendedor', $request->codvendedor)
+                        ->orderBy('fecha', 'desc')
+                        ->first();
+
+                    // Calcular la diferencia en minutos entre la última toma y la hora actual
+                    if ($ultimaCoordenada) {
+                        $ultimaFecha = new \DateTime($ultimaCoordenada->fecha);
+                        $diferenciaMinutos = $now->diff($ultimaFecha)->i; // Obtiene la diferencia en minutos
+
+                        // Solo insertar si ha pasado el tiempo de la frecuencia de toma
+                        if ($diferenciaMinutos < $gpsHorarios->frecuenciatoma) {
+                            return $this->error('Error', 'La frecuencia de toma aún no se ha cumplido.', 400);
+                        }
+                    }
+
+                    // Insertar la nueva coordenada si se cumple la frecuencia o si no hay registros previos
+                    DB::table('coordenadasvendedor')->insert([
                         'codvendedor' => $request->codvendedor,
                         'mac' => $request->mac,
                         'latitud' => $request->latitud,
                         'longitud' => $request->longitud,
-                        'fecha' => $request->fecha,
+                        'fecha' => $now->format('Y-m-d H:i:s'),
                         'bateria' => $request->bateria,
                         'version' => $request->version
                     ]);
+
+                    return $this->success('Coordenada registrada exitosamente.');
+                } else {
+                    return $this->error('Fuera de horario', 'No se permite registrar coordenadas fuera del horario establecido.', 400);
                 }
+            } else {
+                return $this->error('Horario no encontrado', 'No hay horarios configurados para este día.', 404);
             }
-            return $this->success($result);
         } catch (\Exception $e) {
             return $this->error('Error al crear los datos.', $e->getMessage(), 500);
         }
     }
 
     /**
-     * @param string $dia
-     * @return int|string
+     * Obtiene el nombre del día en español
+     *
+     * @return string
      */
-    public function getDayNumber(string $dia): string|int
+    public function obtenerNombreDia(): string
     {
-        switch ($dia) {
-            case 1:
-                $dia = 2;
-                break;
-            case 2:
-                $dia = 3;
-                break;
-            case 3:
-                $dia = 4;
-                break;
-            case 4:
-                $dia = 5;
-                break;
-            case 5:
-                $dia = 6;
-                break;
-            case 6:
-                $dia = 7;
-                break;
-            case 0:
-                $dia = 1;
-                break;
-        }
-        return $dia;
+        $diasSemana = [
+            'Sunday' => 'Domingo',
+            'Monday' => 'Lunes',
+            'Tuesday' => 'Martes',
+            'Wednesday' => 'Miercoles',
+            'Thursday' => 'Jueves',
+            'Friday' => 'Viernes',
+            'Saturday' => 'Sabado'
+        ];
+        $nombreDiaIngles = date('l');
+        return $diasSemana[$nombreDiaIngles] ?? 'Desconocido';
     }
 
 }
