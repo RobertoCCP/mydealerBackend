@@ -16,13 +16,9 @@ class TipoProducto extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'codtipoproducto',
-        'descripcion',
-        'codgrupomaterial',
+        'codtipoproducto',  // Solo el código del tipo de producto
+        'descripcion',      // Solo la descripción del tipo de producto
     ];
 
-    public function grupoMaterial()
-    {
-        return $this->belongsTo(GrupoMaterial::class, 'codgrupomaterial', 'codgrupomaterial');
-    }
+    // Eliminado el método grupoMaterial ya que no es necesario en este caso
 }

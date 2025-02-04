@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Producto;
 use App\Http\Controllers\Controller;
 use App\Models\BodegaStock;
 use App\Models\Producto;
+use App\Models\Productos\TipoProducto;
 use Illuminate\Http\Request;
     use App\Http\Requests\Producto\ProductoRequest;
     use App\Http\Resources\Producto\ProductoResource;
@@ -112,31 +113,18 @@ class ProductoController extends Controller
     *     )
     * )
     */
-    public function buscarPorCategoria(Request $request)
-    {
-        $categoria = $request->input('categoria');
+    public function buscarTiposProductos()
+{
+    // Obtener todos los tipos de productos
+    $tiposProductos = TipoProducto::all();
 
-        $productos = Producto::where('categoria', $categoria)->get();
-
-        $resultados = $productos->map(function ($producto) {
-            $stock = $producto->stocks->sum('stock');
-            return [
-                'codproducto' => $producto->codproducto,
-                'nombre' => $producto->nombre,
-                'precio' => $producto->costo,
-                'precio_con_descuento' => $this->calcularDescuento($producto),
-                'imagen' => $producto->imagen,
-                'categoria' => $producto->categoria,
-                'porc_descuento' => $producto->porcdescuento,
-                'cantidad_en_stock' => $stock
-            ];
-        });
-        if ($resultados->isNotEmpty()) {
-            return $this->success($resultados, 'Ok!!');
-        } else {
-            return $this->error('Error', 'No hay datos!', 404);
-        }
+    if ($tiposProductos->isEmpty()) {
+        return $this->error('Error', 'No hay tipos de productos disponibles', 404);
     }
+
+    return $this->success($tiposProductos, 'Tipos de productos encontrados');
+}
+    
 
     public function productosTipoCategoria($tipoCategoria)
     {

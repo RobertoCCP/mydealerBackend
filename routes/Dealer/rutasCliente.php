@@ -51,7 +51,7 @@ Route::get('/clientesenvioCorreo/{correo}', [RegistroClienteController::class, '
 #PRODUCTOS
 
 //Route::post('productos/detalles', [ProductoController::class, 'productoDetalles']);
-Route::get('/productos/categoria', [ProductoController::class, 'buscarPorCategoria']);
+Route::get('/productos/categoria', [ProductoController::class, 'buscarTiposProductos']);
 Route::get('/productosBusqueda/{nombre}', [ProductoController::class, 'buscarPorNombre']);
 Route::get('/productos/categoria-nombre', [ProductoController::class, 'buscarPorCategoriaYNombre']);
 Route::get('/all/productos', [AllProductosController::class, 'index']);
