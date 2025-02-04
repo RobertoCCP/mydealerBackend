@@ -130,6 +130,10 @@ VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
 php artisan key:generate
 ```
 
+```sh
+php artisan jwt:secret
+```
+
 5. Ejecutar el servidor de desarrollo.
 
 ```sh
